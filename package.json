@@ -3,6 +3,7 @@
     "scripts": {
         "dev": "npm run development",
         "development": "mix",
+        "dev-server": "browser-sync start --server 'public' --files 'public'",
         "watch": "mix watch",
         "watch-poll": "mix watch -- --watch-options-poll=1000",
         "hot": "mix watch --hot",
@@ -17,6 +18,7 @@
         "@tailwindcss/typography": "^0.3.0",
         "@vue/compiler-sfc": "^3.0.5",
         "axios": "^0.21",
+        "browser-sync": "^2.29.3",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
         "postcss": "^8.1.14",
@@ -31,5 +33,8 @@
         "vue": "^3.0.5",
         "vue-i18n": "^9.2.0-beta.9",
         "vue-loader": "^16.1.2"
+    },
+    "dependencies": {
+        "chart.js": "^4.3.2"
     }
 }
