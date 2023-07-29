@@ -12,6 +12,11 @@
             <AppFooter/>
         </div>
 
+        <AppConfig
+            :layoutMode="layoutMode" :layoutThemeMode="layoutThemeMode" :layoutThemeColor="layoutThemeColor"
+            @layout-change="onLayoutChange"
+            @layout-mode-change="onLayoutThemeModeChange"
+            @layout-color-change="onLayoutThemeColorChange" />
         <transition name="layout-mask">
             <div class="layout-mask p-component-overlay" v-if="mobileMenuActive"></div>
         </transition>
@@ -20,6 +25,7 @@
 </template>
 
 <script>
+import AppConfig from '../Components/AppConfig.vue';
 import AppTopBar from '../Components/AppTopbar.vue';
 import AppMenu from '../Components/AppMenu.vue';
 import AppFooter from '../Components/AppFooter.vue';
@@ -29,7 +35,8 @@ export default {
     data() {
         return {
             layoutMode: 'static',
-            layoutColorMode: 'light',
+            layoutThemeMode: 'light',
+            layoutThemeColor: 'indigo',
             staticMenuInactive: false,
             overlayMenuActive: false,
             mobileMenuActive: false,
@@ -37,21 +44,37 @@ export default {
                 {
                     label: 'Menu',
                     items: [
-                        {label: 'Dashboard', icon: 'pi pi-fw pi-home', to: this.route('dashboard'), prefix: 'dashboard'},
+                        { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: this.route('dashboard') }
+                    ]
+                },
+                {
+                    label: 'Manage',
+                    items: [
+                        { label: 'Categories', icon: 'pi pi-fw pi-th-large', to: this.route('users') },
+                        { label: 'Products', icon: 'pi pi-fw pi-tags', to: this.route('roles') },
+                        { label: 'Orders', icon: 'pi pi-fw pi-shopping-cart', to: this.route('permissions') },
+                        { label: 'Reports', icon: 'pi pi-fw pi-print', to: this.route('permissions') },
+                    ]
+                },
+                {
+                    label: 'Settings',
+                    items: [
                         {
-                            label: 'User Management', icon: 'pi pi-fw pi-users',
-                            items : [
-                                {label: 'Users', to: this.route('users')},
-                                {label: 'Roles', to: this.route('roles')},
-                                {label: 'Permissions', to: this.route('permissions')},
+                            label: 'Account',
+                            icon: 'pi pi-fw pi-cog',
+                            items: [
+                                { label: 'Users', icon: 'pi pi-fw pi-users', to: this.route('users') },
+                                { label: 'Roles', icon: 'pi pi-fw pi-sitemap', to: this.route('roles') },
+                                { label: 'Permissions', icon: 'pi pi-fw pi-lock', to: this.route('permissions') }
                             ]
                         },
                         {
                             label: 'Sign out', icon: 'pi pi-fw pi-sign-out', command: () => {
                                 this.$inertia.post(this.route('logout'))
                             },
-                        }]
-                },
+                        }
+                    ]
+                }
             ]
         }
     },
@@ -61,13 +84,13 @@ export default {
             this.$toast.removeAllGroups();
         }
     },
-    mounted(){
+    mounted() {
         this.$nextTick(() => {
             this.onload();
         });
     },
     methods: {
-        onload(){
+        onload() {
             document.documentElement.style.fontSize = 13 + 'px';
         },
         onWrapperClick() {
@@ -78,7 +101,7 @@ export default {
 
             this.menuClick = false;
         },
-        onMenuToggle() {
+        onMenuToggle(event) {
             this.menuClick = true;
 
             if (this.isDesktop()) {
@@ -110,8 +133,11 @@ export default {
         onLayoutChange(layoutMode) {
             this.layoutMode = layoutMode;
         },
-        onLayoutColorChange(layoutColorMode) {
-            this.layoutColorMode = layoutColorMode;
+        onLayoutThemeModeChange(layoutThemeMode) {
+            this.layoutThemeMode = layoutThemeMode;
+        },
+        onLayoutThemeColorChange(layoutThemeColor) {
+            this.layoutThemeColor = layoutThemeColor;
         },
         addClass(element, className) {
             if (element.classList)
@@ -141,18 +167,21 @@ export default {
     },
     computed: {
         containerClass() {
-            return ['layout-wrapper', {
-                'layout-overlay': this.layoutMode === 'overlay',
-                'layout-static': this.layoutMode === 'static',
-                'layout-static-sidebar-inactive': this.staticMenuInactive && this.layoutMode === 'static',
-                'layout-overlay-sidebar-active': this.overlayMenuActive && this.layoutMode === 'overlay',
-                'layout-mobile-sidebar-active': this.mobileMenuActive,
-                'p-input-filled': this.$primevue.config.inputStyle === 'filled',
-                'p-ripple-disabled': this.$primevue.config.ripple === false,
-            }];
+            return [
+                'layout-wrapper',
+                {
+                    'layout-overlay': this.layoutMode === 'overlay',
+                    'layout-static': this.layoutMode === 'static',
+                    'layout-static-sidebar-inactive': this.staticMenuInactive && this.layoutMode === 'static',
+                    'layout-overlay-sidebar-active': this.overlayMenuActive && this.layoutMode === 'overlay',
+                    'layout-mobile-sidebar-active': this.mobileMenuActive,
+                    'p-input-filled': this.$primevue.config.inputStyle === 'filled',
+                    'p-ripple-disabled': this.$primevue.config.ripple === false,
+                }
+            ];
         },
         logo() {
-            return (this.layoutColorMode === 'dark') ? "images/logo-white.svg" : "images/logo.svg";
+            return (this.layoutThemeMode === 'dark') ? "images/logo-white.svg" : "images/logo.svg";
         }
     },
     beforeUpdate() {
@@ -162,10 +191,11 @@ export default {
             this.removeClass(document.body, 'body-overflow-hidden');
     },
     components: {
-        'AppTopBar': AppTopBar,
-        'AppMenu': AppMenu,
-        'AppFooter': AppFooter,
-        Toast,
+        AppConfig,
+        AppTopBar,
+        AppMenu,
+        AppFooter,
+        Toast
     }
 }
 </script>

@@ -36,46 +36,37 @@
             <h6>Menu Type</h6>
             <div class="p-formgroup-inline">
                 <div class="field-radiobutton">
-                    <RadioButton id="static" name="layoutMode" value="static" v-model="d_layoutMode"
+                    <RadioButton id="static" name="layout" value="static" v-model="layout"
                                  @change="changeLayout($event, 'static')"/>
                     <label for="static">Static</label>
                 </div>
                 <div class="field-radiobutton">
-                    <RadioButton id="overlay" name="layoutMode" value="overlay" v-model="d_layoutMode"
+                    <RadioButton id="overlay" name="layout" value="overlay" v-model="layout"
                                  @change="changeLayout($event, 'overlay')"/>
                     <label for="overlay">Overlay</label>
                 </div>
             </div>
 
-            <h6>Color Scheme</h6>
+            <h6>Theme Mode</h6>
             <div class="p-formgroup-inline">
                 <div class="field-radiobutton">
-                    <RadioButton id="light" name="layoutColorMode" value="saga" v-model="themeScheme"
-                                 @change="changeThemeScheme('saga')"/>
+                    <RadioButton id="light" name="layoutThemeMode" value="light" v-model="themeMode"
+                                 @change="changeThemeMode('light')"/>
                     <label for="light">Light</label>
                 </div>
                 <div class="field-radiobutton">
-                    <RadioButton id="dim" name="layoutColorMode" value="vela" v-model="themeScheme"
-                                 @change="changeThemeScheme('vela')"/>
-                    <label for="dim">Dim</label>
-                </div>
-                <div class="field-radiobutton">
-                    <RadioButton id="dark" name="layoutColorMode" value="arya" v-model="themeScheme"
-                                 @change="changeThemeScheme('arya')"/>
+                    <RadioButton id="dark" name="layoutThemeMode" value="dark" v-model="themeMode"
+                                 @change="changeThemeMode('dark')"/>
                     <label for="dark">Dark</label>
                 </div>
             </div>
 
-            <h6>Primary Color</h6>
+            <h6>Theme Color</h6>
             <div class="flex">
-                <div style="width:2rem;height:2rem;border-radius:6px" class="bg-blue-500 mr-3 cursor-pointer"
-                     @click="changeThemeColor('blue')"></div>
-                <div style="width:2rem;height:2rem;border-radius:6px" class="bg-green-500 mr-3 cursor-pointer"
-                     @click="changeThemeColor('green')"></div>
-                <div style="width:2rem;height:2rem;border-radius:6px" class="bg-orange-500 mr-3 cursor-pointer"
-                     @click="changeThemeColor('orange')"></div>
-                <div style="width:2rem;height:2rem;border-radius:6px" class="bg-purple-500 cursor-pointer"
-                     @click="changeThemeColor('purple')"></div>
+                <div style="width:2rem;height:2rem;border-radius:6px" class="bg-indigo-500 mr-3 cursor-pointer"
+                     @click="changeThemeColor('indigo')"></div>
+                <div style="width:2rem;height:2rem;border-radius:6px" class="bg-purple-500 mr-3 cursor-pointer"
+                     @click="changeThemeColor('deeppurple')"></div>
             </div>
         </div>
     </div>
@@ -86,22 +77,25 @@ export default {
     props: {
         layoutMode: {
             type: String,
-            default: null
+            default: 'static'
         },
-        layoutColorMode: {
+        layoutThemeMode: {
             type: String,
-            default: null
+            default: 'light'
+        },
+        layoutThemeColor: {
+            type: String,
+            default: 'indigo'
         }
     },
     data() {
         return {
             active: false,
-            d_layoutMode: this.layoutMode,
-            d_layoutColorMode: this.layoutColorMode,
-            scale: 16,
-            scales: [12, 13, 14, 15, 16],
-            themeScheme: 'saga',
-            themeColor: 'blue'
+            layout: this.layoutMode,
+            scale: 13,
+            scales: [11, 12, 13, 14, 15],
+            themeMode: this.layoutThemeMode,
+            themeColor: this.layoutThemeColor
         }
     },
     watch: {
@@ -112,10 +106,10 @@ export default {
             }
         },
         layoutMode(newValue) {
-            this.d_layoutMode = newValue;
+            this.layout = newValue;
         },
-        layoutColorMode(newValue) {
-            this.d_layoutColorMode = newValue;
+        layoutThemeMode(newValue) {
+            this.themeMode = newValue;
         }
     },
     outsideClickListener: null,
@@ -179,18 +173,22 @@ export default {
             document.documentElement.style.fontSize = this.scale + 'px';
         },
         changeTheme() {
-            let theme = this.themeScheme + '-' + this.themeColor;
-            let themeElement = document.getElementById('theme-link');
-            themeElement.setAttribute('href', themeElement.getAttribute('href').replace(this.$appState.theme, theme));
-            this.$appState.theme = theme;
+            this.$primevue.changeTheme(
+                `mdc-${this.layoutThemeMode}-${this.layoutThemeColor}`,
+                `mdc-${this.themeMode}-${this.themeColor}`,
+                'theme-link',
+                () => {}
+            );
         },
-        changeThemeScheme(scheme) {
-            this.themeScheme = scheme;
+        changeThemeMode(mode) {
+            this.themeMode = mode;
             this.changeTheme();
+            this.$emit('layout-mode-change', mode);
         },
         changeThemeColor(color) {
             this.themeColor = color;
             this.changeTheme();
+            this.$emit('layout-color-change', color);
         }
     },
     computed: {
